@@ -1,0 +1,116 @@
+1- Install ubuntu 18.04 server to RaspberryPi. Follow the instructions on https://www.ubuntu.com/download/iot/raspberry-pi-2-3
+2- Boot with a keyboard, HDMI cable and Screen
+3- Connect an etherhenet cable for shorter boot time. (It waits to find a network on boot)
+4- Command: sudo apt-get update && sudo apt-get upgrade
+5- Setting Wifi connection. plug in usb wifi module.
+6- Ubuntu 18.04 uses netplan by default. So, edit file in /etc/netplan/ with command: 
+sudo nano /etc/netplan/50-cloud-init.yaml
+(50-cloud-init.yaml file can be named differently.)  
+7- Edit .yaml file as:
+network:
+    version: 2
+    ethernets:
+        eth0:
+            dhcp4: true
+            optional: true
+            match:
+                macaddress: b8:27:eb:b9:1e:84
+            set-name: eth0
+
+    wifis:
+        wlan0:
+            dhcp4: no
+            dhcp6: no
+            optional: true
+            addresses: [192.168.43.141(ip adress that you want set statically)/24]
+            gateway4: 192.168.43.1(router gateway)
+            nameservers:
+                addresses: [192.168.43.1(router gateway), 8.8.8.8]
+            access-points:
+                "Your-ssid":
+                    password: "*****"
+8- your wifi module can be named different than wlan0. You can check it with command: iwconfig. If iwconfig not installed, install with command: sudo apt-get install wireless-tools  
+9- We set the ip as adress as a static one, you can also prefer a non static option with configuration as
+network:
+    version: 2
+    wifis:
+        wlan0:
+            optional: true
+            dhcp4: true
+            access-points:
+                "Your-ssid":
+                    password: "****"
+10- optional: true lines are important if you do not want to wait during the boot for ubuntu trying to find a network
+11- After saving the file with editions, command: sudo netplan apply
+12- It is likely that you start getting some repeating errors something like, [1890.40] cpufreq: __target_index: Failed to change cpu frequency: -22, Unplug the ethernet cable, reboot Rpi2. 
+13- You should be able to connected wifi network now. 
+14- Ubuntu 18.04 comes with already installed Python3. You can check with command: sudo apt-get install python3
+15- You may want to install Python2 as well since Robot Racontour(RR) is currently available for python2 only for now. Use command: sudo apt-get install python
+16- Install openCv with commands: 
+sudo apt-get install python3-opencv
+sudo apt-get install python-opencv
+for Python3 and Python2 respectively. These commands will also install several packages such as Numpy.
+------------------------------------------------------------------
+17- Set the hostname: Choose a name for your robot. This is a simple string that will always appear lowercase. You may use, letters (a-z) or numbers (0-9) ​ only​.
+18- Suppose that the name is “duckiebot”. Edit /etc/hostname and replace “ubuntu” with “duckiebot”
+$ sudo nano /etc/hostname
+Note: If you choose to use nano, and are not familiar with it. Save the file and exit with “Ctrl+x” it
+should display the location it will write the file and give a prompt. Type “y” and press enter and
+you should be returned to the regular terminal.
+19- Edit /etc/hosts and again replace “ubuntu” with “duckiebot” or add 127.0.1.1 duckiebot
+$ sudo nano /etc/hosts
+20- Then reboot
+$ sudo reboot
+If you are using a monitor, once you reboot you should see the new hostname:
+Ubuntu 18.04.2 LTS duckiebot tty1
+duckiebot login:
+If you are SSH’ing in, you should now be able to connect using the new hostname.(You should add the ip adress and hostname of robot in your PC with editing /etc/hosts)
+$ ssh ubuntu@<robot name>
+-------------------------------------------------------------------
+21- Set Passwordless ssh for easy connection from remote PC using instructions at https://www.tecmint.com/ssh-passwordless-login-using-ssh-keygen-in-5-easy-steps/
+SSH Client : 192.168.43.251 ( Remote PC )
+SSH Remote Host : 192.168.43.141 ( duckiebot )
+22- First, in your Remote PC command: ssh-keygen -t rsa
+23- Create Ssh directory on duckiebot with command from Remote PC: ssh ubuntu@duckiebot mkdir -p .ssh
+24- Upload your new generated public key (id_rsa.pub) to duckiebot's .ssh directory as a file name authorized_keys with command from Remote PC: cat .ssh/id_rsa.pub | ssh ubuntu@duckiebot 'cat >> .ssh/authorized_keys'
+25- Due to different SSH versions on servers, we need to set permissions on .ssh directory and authorized_keys file with command from RemotePC: ssh ubuntu@duckiebot "chmod 700 .ssh; chmod 640 .ssh/authorized_keys"
+26- From now onwards you can log into duckiebot as ubuntu user from Remote PC without password with command: ssh ubuntu@duckiebot
+------------------------------------------------------------------
+27- Activate Raspberry pi Camera and IO ports
+28- open config.txt with command in Duckiebot: sudo nano /boot/firmware/config.txt and add the lines:
+start_x=1 
+gpu_mem=128
+
+
+29- Save, then reboot the Raspberry Pi with
+sudo reboot
+
+30- Now you can go to the steps for installing RobotRocantour. (RobotRacontour/2019-03-24-Install-and-Camera-example.txt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

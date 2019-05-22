@@ -1,0 +1,14 @@
+1- Run DuckiebotDeep-training3.py
+    - Generates 4 files as: 
+        checkpoint, my_model.data-00000-of-00001, my_model.index, my_model.meta
+2- Run DuckiebotDeep-inference2.py
+    - Generates 4 files for Movidius Command can understand for 1 image instead of batch as:
+        checkpoint, my_model-inference3.data-00000-of-00001, my_model-inference3.index, my_model-inference3.meta
+3- Generate graph file for movidius with command:
+$ mvNCCompile my_model-inference3.meta -s 12 -in input -on output   -o inference3.graph
+    - Generates file inference3.graph
+4- You can also profile your model with command:
+$ mvNCProfile my_model-inference3.meta -s 12 -in input -on output
+    - Generates 4 output named files and 1 'graph' file. This is the same file with inference3.graph
+5- Run DuckiebotDeep-predict3.py
+    - Reads 'graph' file and reads an image and prints the output based on that image
